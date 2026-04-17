@@ -56,6 +56,20 @@ class RequestFormsControllers {
       next(error);
     }
   }
+
+  async generateTicket(req, res, next) {
+    try {
+      const { id } = req.params;
+      const { pdfBuffer, requestId } = await requestFormsServices.generateTicketById(id);
+      
+      const filename = `TripTicket_${requestId || id}.pdf`;
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", `attachment; filename=${filename}`);
+      res.send(pdfBuffer);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = new RequestFormsControllers();

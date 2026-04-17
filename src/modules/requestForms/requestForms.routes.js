@@ -7,5 +7,6 @@ router.post("/", upload.array("attachments", 10), requestFormsControllers.create
 router.patch("/:id", requestFormsControllers.updateRequest);
 router.get("/", requestFormsControllers.getAllRequests);
 router.get("/:id", requestFormsControllers.getRequestById);
+router.get("/:id/generate-ticket", requestFormsControllers.generateTicket);
 
 module.exports = router;

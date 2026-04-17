@@ -212,6 +212,48 @@ ${data.status === 'approved' ? 'A driver and vehicle have been assigned to your 
   async getAllRequests() {
     return await requestFormsData.getAllRequests();
   }
+
+  async generateTicketById(id) {
+    const request = await requestFormsData.getRequestById(id);
+    if (!request) throw new Error("Trip request not found");
+
+    // Fetch dynamic travel authority
+    const authority = await travelAuthoritiesData.getFirstAuthority();
+    let signatureBase64 = null;
+    
+    const signaturePath = authority?.signaturePath || process.env.SIGNATURE_LOCATION;
+    if (signaturePath) {
+      try {
+        const signatureBuffer = await fs.readFile(signaturePath);
+        signatureBase64 = `data:image/png;base64,${signatureBuffer.toString('base64')}`;
+      } catch (err) {
+        console.error("Failed to read signature file:", err);
+      }
+    }
+
+    const pdfBuffer = await generateTicket({
+      requestId: request.requestId,
+      date: new Date().toLocaleDateString('en-PH'),
+      departureDate: request.departureDate.toLocaleDateString('en-PH'),
+      departureTime: request.departureTime.toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit' }),
+      arrivalDate: request.arrivalDate.toLocaleDateString('en-PH'),
+      arrivalTime: request.arrivalTime.toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit' }),
+      destination: request.destination,
+      remarks: request.remarks,
+      purpose: request.purpose,
+      requestedBy: request.requestedBy,
+      driverName: request.drivers?.name || "N/A",
+      vehicleName: request.vehicles?.vehicleName || "N/A",
+      plateNumber: request.vehicles?.plateNumber || "N/A",
+      fuel: "",
+      passengers: request.authorizedPassengers || [],
+      authorityName: authority?.name || "RONNIE B. YOHAN",
+      authorityPlantilla: authority?.plantilla || "ADMINISTRATIVE OFFICER V",
+      authoritySignature: signatureBase64
+    });
+
+    return { pdfBuffer, requestId: request.requestId };
+  }
 }
 
 module.exports = new RequestFormsServices();

@@ -32,20 +32,18 @@
             color: black;
         }
         .label-green {
-            background-color: #92D050;
-            font-weight: bold;
-            color: black;
+            background-color: #92d050;
             border: 1px solid black;
-            padding: 4px 8px;
-            display: inline-block;
-            min-width: 110px;
+            padding: 4px 10px;
+            font-weight: bold;
+            width: fit-content;
+            min-width: 80px;
             text-align: center;
         }
         .value-box {
             border: 1px solid black;
             padding: 4px 8px;
             display: inline-block;
-            margin-right: 15px;
         }
         .title {
             text-align: center;
@@ -65,12 +63,12 @@
             padding: 10px;
         }
         .log-row {
-            height: 25px;
+            height: 30px;
         }
         .passenger-box {
             border: 1px solid black;
             border-top: none;
-            min-height: 335px; /* Further slightly increased to push refuel table down closer to bottom */
+            min-height: 275px; /* Final fine-tuned preference for Page 1 */
             display: flex;
         }
         .passenger-col {
@@ -97,12 +95,12 @@
 
     <div style="display: flex; justify-content: space-between; margin: 15px 0; align-items: center;">
         <div style="display: flex; align-items: center;">
-            <div class="label-green">TRIP TICKET NO.</div>
-            <div class="value-box" style="width: 280px; border: 1px solid #ccc;">{{requestId}}</div>
+            <div class="label-green" style="min-width: 150px;">TRIP TICKET NO.</div>
+            <div class="value-box" style="width: 250px; border: 1px solid #ccc;">{{requestId}}</div>
         </div>
         <div style="display: flex; align-items: center;">
-            <div class="label-green">DATE</div>
-            <div class="value-box" style="min-width: 150px; border: 1px solid #ccc; text-align: center;">{{date}}</div>
+            <div class="label-green" style="min-width: 60px;">DATE</div>
+            <div class="value-box" style="width: 100px; border: 1px solid #ccc; text-align: center;">{{date}}</div>
         </div>
     </div>
 
@@ -277,21 +275,20 @@
             <td style="width: 25%; position: relative;">
                 <div style="font-weight: bold; font-size: 8pt; position: absolute; top: 4px; left: 8px;">ENTRY TIME:</div>
             </td>
-            <td style="width: 25%;"></td>
-            <td style="width: 25%; border: 1px solid black; text-align: center; vertical-align: bottom; position: relative;">
-                <div style="display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%;">
-                    {{#if authoritySignature}}
-                        <img src="{{authoritySignature}}" style="max-height: 80px; max-width: 150px; position: absolute; bottom: 25px; z-index: 1;">
-                    {{/if}}
-                    <div style="font-weight: bold; width: 90%; padding-top: 5px; position: relative; z-index: 2; margin-bottom: 8px;">{{authorityName}}</div>
-                </div>
+            <td style="width: 25%; text-align: center; vertical-align: bottom; padding-bottom: 8px;">
+                <div style="font-weight: bold; font-size: 10pt;">{{driverName}}</div>
+            </td>
+            <td style="width: 25%; border: 1px solid black; text-align: center; vertical-align: bottom; padding-bottom: 8px; position: relative;">
+                {{#if authoritySignature}}
+                    <img src="{{authoritySignature}}" style="max-height: 80px; max-width: 150px; position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%); z-index: 1;">
+                {{/if}}
+                <div style="font-weight: bold; width: 90%; margin: 0 auto; position: relative; z-index: 2; font-size: 10pt;">{{authorityName}}</div>
             </td>
         </tr>
-        <tr style="height: 50px;">
+        <tr style="height: 40px;">
             <td colspan="2" style="text-align: center; vertical-align: middle; font-weight: bold; font-size: 8pt;">GUARD ON DUTY:</td>
-            <td style="text-align: center; vertical-align: bottom; font-size: 8pt; padding-bottom: 4px;">
-                <div style="font-weight: bold; margin-bottom: 4px;">{{driverName}}</div>
-                <div style="border-top: 1px solid black; padding-top: 2px;">DRIVER</div>
+            <td style="text-align: center; vertical-align: middle; font-size: 8pt;">
+                <div style="font-weight: bold;">DRIVER</div>
             </td>
             <td style="text-align: center; vertical-align: middle; font-weight: bold; font-size: 8pt;">{{authorityPlantilla}}</td>
         </tr>

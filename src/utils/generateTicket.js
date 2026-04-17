@@ -23,7 +23,7 @@ async function generateTicket(data) {
         const html = template({
             ...data,
             passengers,
-            logRows: new Array(32).fill({}) 
+            logRows: new Array(23).fill({}) 
         });
 
         const browser = await puppeteer.launch({
