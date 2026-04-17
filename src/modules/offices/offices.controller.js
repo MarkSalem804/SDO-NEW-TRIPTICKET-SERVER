@@ -1,4 +1,5 @@
 const officesService = require("./offices.service");
+const socket = require("../../middlewares/socket-connection");
 
 class OfficesController {
   async getOffices(req, res, next) {
@@ -13,6 +14,7 @@ class OfficesController {
   async createOffice(req, res, next) {
     try {
       const office = await officesService.createOffice(req.body);
+      socket.getIO().emit("office-update", { action: "create", office });
       return res.status(201).json(office);
     } catch (err) {
       next(err);
@@ -23,6 +25,7 @@ class OfficesController {
     try {
       const { id } = req.params;
       const office = await officesService.updateOffice(id, req.body);
+      socket.getIO().emit("office-update", { action: "update", office });
       return res.status(200).json(office);
     } catch (err) {
       next(err);
@@ -33,6 +36,7 @@ class OfficesController {
     try {
       const { id } = req.params;
       await officesService.deleteOffice(id);
+      socket.getIO().emit("office-update", { action: "delete", id });
       return res.status(200).json({ message: "Office deleted successfully" });
     } catch (err) {
       next(err);

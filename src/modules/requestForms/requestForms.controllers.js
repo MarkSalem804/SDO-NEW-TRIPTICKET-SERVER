@@ -1,10 +1,12 @@
 const requestFormsServices = require("./requestForms.services");
 const { convertDatesToPhilippineTime } = require("../../utils/dateHelper")
+const socket = require("../../middlewares/socket-connection");
 
 class RequestFormsControllers {
   async createRequest(req, res, next) {
     try {
       const request = await requestFormsServices.createRequest(req.body, req.files);
+      socket.getIO().emit("new-trip-request", { type: "CREATE", request });
       res.status(201).json({
         success: true,
         message: "Trip request created successfully",
@@ -19,6 +21,7 @@ class RequestFormsControllers {
     try {
       const { id } = req.params;
       const updatedRequest = await requestFormsServices.updateRequest(id, req.body);
+      socket.getIO().emit("new-trip-request", { type: "UPDATE", request: updatedRequest });
       res.status(200).json({
         success: true,
         message: "Trip request updated successfully",

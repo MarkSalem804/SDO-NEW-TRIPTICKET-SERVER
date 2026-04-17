@@ -1,11 +1,13 @@
 const usersService = require("./users.services");
 const tokenUtils = require("../../utils/token.utils");
+const socket = require("../../middlewares/socket-connection");
 
 class UsersController {
   async register(req, res) {
     try {
       const user = await usersService.register(req.body);
       const { password: userPassword, ...userData } = user;
+      socket.getIO().emit("user-update", { action: "register", user: userData });
       res.status(201).json({ message: "User registered successfully", user: userData });
     } catch (error) {
       res.status(400).json({ message: error.message });
@@ -142,6 +144,7 @@ class UsersController {
     try {
       const user = await usersService.updateUser(req.params.id, req.body);
       const { password, ...userData } = user;
+      socket.getIO().emit("user-update", { action: "update", user: userData });
       res.status(200).json({ message: "User updated successfully", user: userData });
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -160,6 +163,7 @@ class UsersController {
   async deactivateUser(req, res) {
     try {
       await usersService.deactivateUser(req.params.id);
+      socket.getIO().emit("user-update", { action: "deactivate", id: req.params.id });
       res.status(200).json({ message: "User deactivated successfully" });
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -169,6 +173,7 @@ class UsersController {
   async activateUser(req, res) {
     try {
       await usersService.activateUser(req.params.id);
+      socket.getIO().emit("user-update", { action: "activate", id: req.params.id });
       res.status(200).json({ message: "User reactivated successfully" });
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -241,6 +246,7 @@ class UsersController {
     try {
       const { password } = req.body;
       await usersService.resetPassword(req.params.id, password);
+      socket.getIO().emit("user-update", { action: "reset-password", id: req.params.id });
       res.status(200).json({ message: "Password reset successfully" });
     } catch (error) {
       res.status(500).json({ message: error.message });

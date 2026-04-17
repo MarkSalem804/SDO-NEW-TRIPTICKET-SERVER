@@ -1,4 +1,5 @@
 const driversService = require("./drivers.services");
+const socket = require("../../middlewares/socket-connection");
 
 class DriversController {
   async createDriver(req, res) {
@@ -9,6 +10,7 @@ class DriversController {
         driverEmail,
         driverContactNo,
       });
+      socket.getIO().emit("driver-update", { action: "create", driver });
       res.status(201).json({ message: "Driver created successfully", driver });
     } catch (error) {
       res.status(400).json({ message: error.message });
@@ -37,6 +39,7 @@ class DriversController {
   async updateDriver(req, res) {
     try {
       const driver = await driversService.updateDriver(req.params.id, req.body);
+      socket.getIO().emit("driver-update", { action: "update", driver });
       res.status(200).json({ message: "Driver updated successfully", driver });
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -46,6 +49,7 @@ class DriversController {
   async deleteDriver(req, res) {
     try {
       await driversService.deleteDriver(req.params.id);
+      socket.getIO().emit("driver-update", { action: "delete", id: req.params.id });
       res.status(200).json({ message: "Driver deleted successfully" });
     } catch (error) {
       res.status(500).json({ message: error.message });

@@ -21,5 +21,5 @@ socket.init(httpServer);
 // })
 
 httpServer.listen(PORT, () => {
-  console.log(`IMPACT backend running on https://sdotripticket.depedimuscity.com:${PORT}`)
+  console.log(`IMPACT backend running on https://sdoictripticket.depedimuscity.com:${PORT}`)
 })

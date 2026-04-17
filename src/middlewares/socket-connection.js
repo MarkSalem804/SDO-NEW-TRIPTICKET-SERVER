@@ -7,9 +7,10 @@ const socket = {
     io = new Server(httpServer, {
       cors: {
         origin: [
-          "http://localhost:3000", // React frontend dev
+          "http://localhost:3000",
           "http://127.0.0.1:3000",
-          "https://your-production-domain.com" // production frontend
+          "https://sdoictripticket.depedimuscity.com",
+          "https://sdotripticket.depedimuscity.com"
         ],
         methods: ["GET", "POST"],
         credentials: true
