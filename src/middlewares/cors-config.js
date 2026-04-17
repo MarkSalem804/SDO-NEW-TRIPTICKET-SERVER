@@ -9,7 +9,7 @@ const corsConfig = () => {
       "http://localhost:3000",
       "http://127.0.0.1:5173",
       "http://127.0.0.1:5174",
-      "https://your-production-domain.com"
+      "https://sdoictripticket.depedimuscity.com"
     ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],

@@ -2,17 +2,14 @@ require("dotenv").config()
 const app = require("./app")
 const socket = require("./src/middlewares/socket-connection")
 const fs = require("fs")
-const https = require("https")
+const http = require("http")
 
 const PORT = process.env.PORT || 5011
 
-const httpServer = https.createServer({
-    key: fs.readFileSync(process.env.PRIV_KEY_CERT_LOCATION),
-    cert: fs.readFileSync(process.env.FULLCHAIN_CERT_LOCATION)
-}, app);
+const httpServer = http.createServer(app);
 
 socket.init(httpServer);
 
 httpServer.listen(PORT, () => {
-  console.log(`IMPACT backend running on https://localhost:${PORT}`)
+  console.log(`IMPACT backend running on http://localhost:${PORT}`)
 })

@@ -161,8 +161,8 @@ ${data.status === 'approved' ? 'A driver and vehicle have been assigned to your 
           });
 
           // Store the ticket in the specified path with fallbacks
-          const approvedPath = process.env.APPROVED_TICKETS_PATH || path.join(process.env.USERPROFILE, "Desktop/TRIP TICKETS/Tickets/Approved");
-          const rejectedPath = process.env.REJECTED_TICKETS_PATH || path.join(process.env.USERPROFILE, "Desktop/TRIP TICKETS/Tickets/Rejected");
+          const approvedPath = process.env.APPROVED_TICKETS_PATH || path.join(__dirname, "../../../tmp/tickets/approved");
+          const rejectedPath = process.env.REJECTED_TICKETS_PATH || path.join(__dirname, "../../../tmp/tickets/rejected");
           
           const currentStatus = (updatedRequest.status || "").toLowerCase();
           const storageDir = currentStatus === 'approved' ? approvedPath : rejectedPath;

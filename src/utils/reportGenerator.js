@@ -13,7 +13,7 @@ async function generateReport(type, data) {
         // Convert logo if needed
         let logoBase64 = "";
         try {
-            const logoPath = 'C:\\Users\\Mac\\Documents\\GitHub\\SDO-NEW-TRIPTICKET-CLIENT\\public\\kagawaran.png';
+            const logoPath = path.join(__dirname, "../assets/kagawaran.png");
             const logoBuffer = await fs.readFile(logoPath);
             logoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`;
         } catch (err) {
