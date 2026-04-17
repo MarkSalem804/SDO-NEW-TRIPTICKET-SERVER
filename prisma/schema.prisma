@@ -1,0 +1,191 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id                Int            @id @default(autoincrement())
+  email             String         @unique
+  password          String         @db.Text
+  firstName         String?        @db.Text
+  lastName          String?        @db.Text
+  status            String         @default("ACTIVE")
+  plantillaLocation String?
+  office            offices?       @relation(fields: [officeId], references: [id])
+  officeId          Int?
+  positionTitle     String?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  role              String         @default("ADMINISTRATOR")
+  mfaEnabled        Boolean        @default(false)
+  mfaSecret         String?        @db.Text
+  pincode           String?        @db.Text
+  pincodeEnabled    Boolean        @default(false)
+  sessionTokens     sessionToken[]
+  refreshTokens     refreshToken[]
+  otps              otp[]
+}
+
+model otp {
+  id        Int      @id @default(autoincrement())
+  user      user     @relation(fields: [userId], references: [id])
+  userId    Int
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model sessionToken {
+  id        Int      @id @default(autoincrement())
+  user      user     @relation(fields: [userId], references: [id])
+  userId    Int
+  token     String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model refreshToken {
+  id        Int      @id @default(autoincrement())
+  user      user     @relation(fields: [userId], references: [id])
+  userId    Int
+  token     String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum roles {
+  SYSTEM_ADMINISTRATOR
+  ADMINISTRATOR
+}
+
+model requestForm {
+  id                   Int             @id @default(autoincrement())
+  requestId            String?         @unique
+  status               String          @default("pending")
+  requestedBy          String          @db.Text
+  email                String          @db.Text
+  office               offices?        @relation(fields: [officeId], references: [id])
+  officeId             Int?
+  designation          String          @db.Text
+  destination          String          @db.Text
+  purpose              String          @db.Text
+  departureDate        DateTime
+  arrivalDate          DateTime
+  departureTime        DateTime
+  arrivalTime          DateTime
+  authorizedPassengers Json?
+  remarks              String          @db.Text
+  drivers              drivers?        @relation(fields: [driverId], references: [id])
+  driverId             Int?
+  vehicles             vehicles?       @relation(fields: [vehicleId], references: [id])
+  vehicleId            Int?
+  attachments          Json?
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+  travels              travels[]
+  urgentTravels        urgentTravels[]
+}
+
+model offices {
+  id           Int           @id @default(autoincrement())
+  officeName   String        @db.Text
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  requestForms requestForm[]
+  users        user[]
+}
+
+model vehicles {
+  id            Int             @id @default(autoincrement())
+  plateNumber   String          @db.Text
+  vehicleName   String?         @db.Text
+  vehicleTypes  vehicleTypes    @relation(fields: [vehicleTypeId], references: [id])
+  vehicleTypeId Int
+  rfidNo        String          @db.Text
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  requestForms  requestForm[]
+  travels       travels[]
+  urgentTravels urgentTravels[]
+  vehicleLogs   vehicleLogs[]
+}
+
+model vehicleTypes {
+  id        Int        @id @default(autoincrement())
+  typeName  String     @db.Text
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  vehicles  vehicles[]
+}
+
+model drivers {
+  id              Int             @id @default(autoincrement())
+  name            String?         @db.Text
+  driverEmail     String?
+  driverContactNo String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  requestForms    requestForm[]
+  travels         travels[]
+  urgentTravels   urgentTravels[]
+}
+
+model travels {
+  id            Int         @id @default(autoincrement())
+  tripticketId  String?     @unique
+  requestFormId Int
+  requestForm   requestForm @relation(fields: [requestFormId], references: [id])
+  driverId      Int
+  driver        drivers     @relation(fields: [driverId], references: [id])
+  vehicleId     Int
+  vehicle       vehicles    @relation(fields: [vehicleId], references: [id])
+  departureTime DateTime?
+  departureDate DateTime?
+  arrivalDate   DateTime?
+  arrivalTime   DateTime?
+  travelStatus  String?     @default("SCHEDULED")
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model urgentTravels {
+  id            Int         @id @default(autoincrement())
+  urgentTripId  String?     @unique
+  requestFormId Int
+  requestForm   requestForm @relation(fields: [requestFormId], references: [id])
+  driverId      Int
+  driver        drivers     @relation(fields: [driverId], references: [id])
+  vehicleId     Int
+  vehicle       vehicles    @relation(fields: [vehicleId], references: [id])
+  departureTime DateTime?
+  departureDate DateTime?
+  arrivalDate   DateTime?
+  arrivalTime   DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model travelAuthorities {
+  id            Int      @id @default(autoincrement())
+  name          String   @db.Text
+  plantilla     String?  @db.Text
+  signaturePath String?  @db.Text
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  status        String?  @default("Active")
+}
+
+model vehicleLogs {
+  id        Int      @id @default(autoincrement())
+  rfidNo    String   @db.Text
+  vehicleId Int
+  vehicle   vehicles @relation(fields: [vehicleId], references: [id])
+  type      String   @db.Text // "IN" or "OUT"
+  timestamp DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

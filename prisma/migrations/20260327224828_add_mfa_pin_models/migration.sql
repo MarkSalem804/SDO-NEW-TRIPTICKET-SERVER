@@ -1,0 +1,19 @@
+-- AlterTable
+ALTER TABLE `user` ADD COLUMN `mfaEnabled` BOOLEAN NOT NULL DEFAULT false,
+    ADD COLUMN `mfaSecret` TEXT NULL,
+    ADD COLUMN `pincode` TEXT NULL,
+    ADD COLUMN `pincodeEnabled` BOOLEAN NOT NULL DEFAULT false;
+
+-- CreateTable
+CREATE TABLE `otp` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `userId` INTEGER NOT NULL,
+    `code` VARCHAR(191) NOT NULL,
+    `expiresAt` DATETIME(3) NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AddForeignKey
+ALTER TABLE `otp` ADD CONSTRAINT `otp_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

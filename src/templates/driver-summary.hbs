@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            font-family: "Bookman Old Style", serif;
+            margin: 5px 20px 20px 20px;
+            color: #000;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header img {
+            width: 60px;
+            height: auto;
+            margin-bottom: 5px;
+        }
+        .old-english {
+            font-family: "Old English Text MT", serif;
+            font-size: 18px;
+            font-weight: bold;
+            line-height: 1;
+            margin-bottom: -2px;
+        }
+        .dept-title {
+            font-family: "Old English Text MT", serif;
+            font-size: 22px;
+            font-weight: bold;
+            line-height: 1;
+            margin-bottom: 2px;
+        }
+        .sub-dept {
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            line-height: 1.2;
+        }
+        .title {
+            text-align: center;
+            font-size: 16px;
+            font-weight: 800;
+            margin: 30px 0;
+            text-transform: uppercase;
+        }
+        .vehicle-info {
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .vehicle-info b {
+            text-decoration: underline;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px 4px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .dest-col {
+            text-align: left;
+            width: 25%;
+        }
+        .pass-col {
+            text-align: left;
+            width: 20%;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="{{logoBase64}}" alt="Logo"><br>
+        <div class="old-english">Republic of the Philippines</div>
+        <div class="dept-title">Department of Education</div>
+        <div class="sub-dept">REGION IV-A CALABARZON</div>
+        <div class="sub-dept">SCHOOLS DIVISION OF IMUS CITY</div>
+    </div>
+
+    <div class="title">MONTHLY SUMMARY OF OFFICIAL TRIPS/TRAVELS CONDUCTED</div>
+
+    <div class="vehicle-info">
+        Name of Government Vehicle: <b>{{vehicleName}}</b><br>
+        Plate Number: <b>{{plateNumber}}</b><br>
+        Month: <b>{{month}}</b>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Destination</th>
+                <th>Toll Fee<br><small>(TOTAL PER TRIP)</small></th>
+                <th>Distance Travelled<br>(km)</th>
+                <th>Fuel Consumption<br>(Liters)</th>
+                <th>Driver</th>
+                <th>Passengers</th>
+                <th>Trip Ticket No.</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each travels}}
+            <tr>
+                <td>{{date}}</td>
+                <td class="dest-col">{{destination}}</td>
+                <td>{{tollFee}}</td>
+                <td>{{distance}}</td>
+                <td>{{fuel}}</td>
+                <td>{{driver}}</td>
+                <td class="pass-col">{{passengers}}</td>
+                <td>{{tripticketId}}</td>
+            </tr>
+            {{/each}}
+            {{#unless travels}}
+            <tr>
+                <td colspan="8">No travels found for this period.</td>
+            </tr>
+            {{/unless}}
+        </tbody>
+    </table>
+</body>
+</html>

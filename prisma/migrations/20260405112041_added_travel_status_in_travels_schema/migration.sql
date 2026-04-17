@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `travels` ADD COLUMN `travelStatus` VARCHAR(191) NULL DEFAULT 'SCHEDULED';

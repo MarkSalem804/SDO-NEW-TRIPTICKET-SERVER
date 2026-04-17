@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Trip Ticket</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10pt;
+            line-height: 1.2;
+            margin: 0;
+            padding: 25px;
+            color: #333;
+        }
+        .page-break {
+            page-break-before: always;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 5px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 4px 8px;
+            vertical-align: top;
+        }
+        .bg-green {
+            background-color: #92D050; 
+            font-weight: bold;
+            text-align: center;
+            color: black;
+        }
+        .label-green {
+            background-color: #92D050;
+            font-weight: bold;
+            color: black;
+            border: 1px solid black;
+            padding: 4px 8px;
+            display: inline-block;
+            min-width: 110px;
+            text-align: center;
+        }
+        .value-box {
+            border: 1px solid black;
+            padding: 4px 8px;
+            display: inline-block;
+            margin-right: 15px;
+        }
+        .title {
+            text-align: center;
+            font-weight: bold;
+            margin: 50px 0 20px 0; /* More top padding */
+            font-size: 13pt;
+            text-transform: uppercase;
+        }
+        .signature-area {
+            border: 1px solid black;
+            border-top: none;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 10px;
+        }
+        .log-row {
+            height: 25px;
+        }
+        .passenger-box {
+            border: 1px solid black;
+            border-top: none;
+            min-height: 335px; /* Further slightly increased to push refuel table down closer to bottom */
+            display: flex;
+        }
+        .passenger-col {
+            flex: 1;
+            padding: 10px;
+        }
+        .passenger-col:first-child {
+            border-right: 1px solid black;
+        }
+        .compact-table td {
+            padding: 2px 5px;
+            font-size: 9pt;
+        }
+    </style>
+</head>
+<body>
+    <!-- PAGE 1 -->
+    <table>
+        <tr>
+            <td style="width: 45%; font-weight: bold;">SCHOOLS DIVISION OF IMUS CITY</td>
+            <td style="width: 55%; font-weight: bold;">DRIVER&rsquo;S TRIP TICKET</td>
+        </tr>
+    </table>
+
+    <div style="display: flex; justify-content: space-between; margin: 15px 0; align-items: center;">
+        <div style="display: flex; align-items: center;">
+            <div class="label-green">TRIP TICKET NO.</div>
+            <div class="value-box" style="width: 280px; border: 1px solid #ccc;">{{requestId}}</div>
+        </div>
+        <div style="display: flex; align-items: center;">
+            <div class="label-green">DATE</div>
+            <div class="value-box" style="min-width: 150px; border: 1px solid #ccc; text-align: center;">{{date}}</div>
+        </div>
+    </div>
+
+    <div class="title">TRAVEL REQUEST SUMMARY</div>
+
+    <table>
+        <tr>
+            <th class="bg-green" style="width: 25%;">DEPARTURE</th>
+            <th class="bg-green" style="width: 25%;">ARRIVAL</th>
+            <th class="bg-green" style="width: 50%;">DESTINATION:</th>
+        </tr>
+        <tr>
+            <td style="height: 50px;">
+                <b>DATE:</b> {{departureDate}}<br><br>
+                <b>TIME:</b> {{departureTime}}
+            </td>
+            <td>
+                <b>DATE:</b> {{arrivalDate}}<br><br>
+                <b>TIME:</b> {{arrivalTime}}
+            </td>
+            <td rowspan="2">
+                {{destination}}
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" style="height: 50px;">
+                <b>OTHER REMARKS:</b><br>
+                {{remarks}}
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3" style="height: 60px;">
+                <b>PURPOSE:</b><br>
+                {{purpose}}
+            </td>
+        </tr>
+    </table>
+
+    <div style="display: flex; gap: 15px; margin-top: 10px; align-items: stretch;">
+        <div style="width: 45%; display: flex; flex-direction: column;">
+            <div class="bg-green" style="border: 1px solid black; padding: 4px;">REQUESTED BY:</div>
+            <div class="signature-area" style="height: 120px;">
+                <div style="font-weight: bold; border-bottom: 1px solid black; width: 90%; text-align: center; margin-bottom: 5px;">{{requestedBy}}</div>
+                <div style="font-size: 8pt; text-transform: uppercase;">SIGNATURE OVER PRINTED NAME</div>
+            </div>
+        </div>
+        <div style="width: 55%;">
+            <table style="height: 100%; min-height: 153px;">
+                <tr>
+                    <td class="bg-green" style="text-align: left; width: 40%; vertical-align: middle;">AUTHORIZED DRIVER:</td>
+                    <td style="vertical-align: middle;">{{driverName}}</td>
+                </tr>
+                <tr>
+                    <td class="bg-green" style="text-align: left; vertical-align: middle;">VEHICLE:</td>
+                    <td style="vertical-align: middle;">{{vehicleName}}</td>
+                </tr>
+                <tr>
+                    <td class="bg-green" style="text-align: left; vertical-align: middle;">PLATE NO.</td>
+                    <td style="vertical-align: middle;">{{plateNumber}}</td>
+                </tr>
+                <tr>
+                    <td class="bg-green" style="text-align: left; vertical-align: middle;">FUEL</td>
+                    <td style="vertical-align: middle;">{{fuel}}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="bg-green" style="border: 1px solid black; padding: 4px; margin-top: 10px;">NAME AND SIGNATURE OF AUTHORIZED PASSENGERS</div>
+    <div class="passenger-box">
+        <div class="passenger-col">
+            {{#each passengers}}
+                <div style="border-bottom: 1px solid #eee; padding: 3px 0;">{{this}}</div>
+            {{/each}}
+        </div>
+        <div class="passenger-col"></div>
+    </div>
+
+    <table class="compact-table" style="margin-top: 10px;">
+        <tr class="bg-green">
+            <th colspan="2">REFUEL</th>
+            <th colspan="3">TOLL</th>
+        </tr>
+        <tr>
+            <td style="width: 20%;">GASOLINE</td>
+            <td style="width: 20%;"></td>
+            <td class="bg-green" style="text-align: left; width: 20%;">CASH</td>
+            <td class="bg-green" style="text-align: left; width: 20%;">RFID</td>
+            <td style="width: 10%;"></td>
+        </tr>
+        <tr>
+            <td>LOCATION</td>
+            <td></td>
+            <td class="bg-green" style="text-align: left;">EXPRESSWAY</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>SALES INVOICE</td>
+            <td></td>
+            <td class="bg-green" style="text-align: left;">ENTRY</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>NO. OF LITERS</td>
+            <td></td>
+            <td class="bg-green" style="text-align: left;">EXIT</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>PRICE PER LITER</td>
+            <td></td>
+            <td class="bg-green" style="text-align: left;">AMOUNT (PER WAY)</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>AMOUNT</td>
+            <td></td>
+            <td class="bg-green" style="text-align: left;">TOTAL AMOUNT.</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td colspan="2"></td>
+            <td class="bg-green" style="text-align: left;">SALES INVOICE NO.</td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+
+    <!-- PAGE 2 -->
+    <div class="page-break"></div>
+    <div class="title" style="margin-top: 10px;">TRAVEL LOGS</div>
+    <table style="margin-bottom: 15px;">
+        <tr class="bg-green">
+            <th colspan="3" style="width: 43%;">ORIGIN</th>
+            <th colspan="3" style="width: 43%;">DESTINATION</th>
+            <th style="width: 14%;">DISTANCE</th>
+        </tr>
+        <tr class="bg-green">
+            <th style="width: 18%;">PLACE</th>
+            <th style="width: 10%;">TIME</th>
+            <th style="width: 15%;">ODOMETER(X)</th>
+            <th style="width: 18%;">PLACE</th>
+            <th style="width: 10%;">TIME</th>
+            <th style="width: 15%;">ODOMETER(Y)</th>
+            <th style="width: 14%;">(X-Y)</th>
+        </tr>
+        {{#each logRows}}
+        <tr class="log-row">
+            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+        </tr>
+        {{/each}}
+    </table>
+
+    <div style="margin: 10px 0; font-style: italic; font-size: 9pt;">
+        I hereby certify that the vehicle was used on official activities, and to the correctness of the above statement record of travel.
+    </div>
+
+    <!-- REFINED SECOND PAGE FOOTER -->
+    <table style="margin-top: 5px;">
+        <tr>
+            <th colspan="4" class="bg-green">VERIFIED BY</th>
+        </tr>
+        <tr style="height: 100px;">
+            <td style="width: 25%; position: relative;">
+                <div style="font-weight: bold; font-size: 8pt; position: absolute; top: 4px; left: 8px;">EXIT TIME:</div>
+            </td>
+            <td style="width: 25%; position: relative;">
+                <div style="font-weight: bold; font-size: 8pt; position: absolute; top: 4px; left: 8px;">ENTRY TIME:</div>
+            </td>
+            <td style="width: 25%;"></td>
+            <td style="width: 25%; border: 1px solid black; text-align: center; vertical-align: bottom; position: relative;">
+                <div style="display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%;">
+                    {{#if authoritySignature}}
+                        <img src="{{authoritySignature}}" style="max-height: 80px; max-width: 150px; position: absolute; bottom: 25px; z-index: 1;">
+                    {{/if}}
+                    <div style="font-weight: bold; width: 90%; padding-top: 5px; position: relative; z-index: 2; margin-bottom: 8px;">{{authorityName}}</div>
+                </div>
+            </td>
+        </tr>
+        <tr style="height: 50px;">
+            <td colspan="2" style="text-align: center; vertical-align: middle; font-weight: bold; font-size: 8pt;">GUARD ON DUTY:</td>
+            <td style="text-align: center; vertical-align: bottom; font-size: 8pt; padding-bottom: 4px;">
+                <div style="font-weight: bold; margin-bottom: 4px;">{{driverName}}</div>
+                <div style="border-top: 1px solid black; padding-top: 2px;">DRIVER</div>
+            </td>
+            <td style="text-align: center; vertical-align: middle; font-weight: bold; font-size: 8pt;">{{authorityPlantilla}}</td>
+        </tr>
+    </table>
+</body>
+</html>

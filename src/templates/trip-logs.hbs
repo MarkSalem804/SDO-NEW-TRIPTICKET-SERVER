@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            font-family: "Bookman Old Style", serif;
+            margin: 5px 20px 20px 20px;
+            color: #000;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header img {
+            width: 60px;
+            height: auto;
+            margin-bottom: 5px;
+        }
+        .old-english {
+            font-family: "Old English Text MT", serif;
+            font-size: 18px;
+            font-weight: bold;
+            line-height: 1;
+            margin-bottom: -2px;
+        }
+        .dept-title {
+            font-family: "Old English Text MT", serif;
+            font-size: 22px;
+            font-weight: bold;
+            line-height: 1;
+            margin-bottom: 2px;
+        }
+        .sub-dept {
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            line-height: 1.2;
+        }
+        .title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin: 20px 0 5px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px 5px;
+            text-align: left;
+        }
+        th {
+            background-color: #f9f9f9;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="{{logoBase64}}" alt="Logo"><br>
+        <div class="old-english">Republic of the Philippines</div>
+        <div class="dept-title">Department of Education</div>
+        <div class="sub-dept">REGION IV-A CALABARZON</div>
+        <div class="sub-dept">SCHOOLS DIVISION OF IMUS CITY</div>
+    </div>
+
+    <div class="title">Monthly Trip Logs</div>
+    <div style="text-align: center; margin-bottom: 20px; font-size: 12px;">Period: {{month}}</div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Requestor</th>
+                <th>Trip Ticket ID</th>
+                <th>Passengers</th>
+                <th>Departure</th>
+                <th>Arrival</th>
+                <th>Destination</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each travels}}
+            <tr>
+                <td>{{requestor}}</td>
+                <td>{{tripticketId}}</td>
+                <td>{{passengers}}</td>
+                <td>{{departure}}</td>
+                <td>{{arrival}}</td>
+                <td>{{destination}}</td>
+            </tr>
+            {{/each}}
+            {{#unless travels}}
+            <tr>
+                <td colspan="6" style="text-align: center;">No trip logs found for this period.</td>
+            </tr>
+            {{/unless}}
+        </tbody>
+    </table>
+</body>
+</html>
