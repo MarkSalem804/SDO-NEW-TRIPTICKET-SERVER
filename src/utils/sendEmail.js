@@ -21,7 +21,6 @@ async function sendEmail(to, subject, text, html = null, attachments = []) {
 
     return info;
   } catch (err) {
-    console.error("Error sending email:", err);
     throw new Error("Failed to send email");
   }
 }

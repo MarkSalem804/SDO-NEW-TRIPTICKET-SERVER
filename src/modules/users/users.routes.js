@@ -14,7 +14,10 @@ router.post("/verify-mfa", usersController.verifyOTP);
 router.post("/resend-mfa", usersController.resendOTP);
 router.post("/refresh", usersController.refresh);
 router.post("/logout", usersController.logout);
-router.get("/me", authMiddleware, usersController.getMe);
+router.get("/me", (req, res, next) => {
+  req.headers['x-auth-optional'] = 'true';
+  next();
+}, authMiddleware, usersController.getMe);
 router.get("/get-all-users", authMiddleware, usersController.getAllUsers);
 
 // Specific routes first

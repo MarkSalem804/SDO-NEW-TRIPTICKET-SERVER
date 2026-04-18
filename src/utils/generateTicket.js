@@ -47,7 +47,6 @@ async function generateTicket(data) {
         await browser.close();
         return pdf;
     } catch (error) {
-        console.error("Error generating PDF:", error);
         throw error;
     }
 }

@@ -10,14 +10,10 @@ const socket = require("../../middlewares/socket-connection");
 
 class RequestFormsServices {
   async createRequest(data, files) {
-    console.log("createRequest hit!", { hasFiles: !!(files && files.length), requestId: data.requestId });
-    
     if (!data.requestedBy || !data.email) {
       throw new Error("Missing required fields: requestedBy and email");
     }
 
-    console.log("[DEBUG] prisma.requestForm exists at runtime:", !!prisma.requestForm);
-    
     // Generate requestId immediately
     const requestId = await generateTripId(prisma.requestForm, "requestId");
     data.requestId = requestId;
@@ -25,8 +21,6 @@ class RequestFormsServices {
     if (files && files.length > 0) {
       const attachmentsPath = process.env.ATTACHMENTS_PATH || "C:/Attachments";
       const targetDir = path.join(attachmentsPath, requestId);
-      
-      console.log("Saving attachments to:", targetDir);
       
       try {
         await fs.mkdir(targetDir, { recursive: true });
@@ -41,23 +35,19 @@ class RequestFormsServices {
         }
         
         data.attachments = filePaths;
-        console.log("Attachments saved successfully:", filePaths.length, "files");
 
         // Try to save to database
         try {
           return await requestFormsData.createRequest(data);
         } catch (dbError) {
           // DATABASE FAIL: CLEAN UP ATTACHMENTS
-          console.error("Database error! Cleaning up attachments in:", targetDir);
           try {
             await fs.rm(targetDir, { recursive: true, force: true });
           } catch (cleanupErr) {
-            console.error("Failed to cleanup attachments after DB error:", cleanupErr);
           }
           throw dbError; // Rethrow to show error in API
         }
       } catch (err) {
-        console.error("Error moving/saving attachments:", err);
         // If it was a DB error rethrown, don't fallback, just rethrow
         if (err.code || err.message.includes("prisma")) throw err;
         
@@ -70,7 +60,6 @@ class RequestFormsServices {
     try {
       socket.getIO().emit("new-trip-request", { type: "CREATE", request: result });
     } catch (err) {
-      console.error("Socket emit failed:", err.message);
     }
     return result;
   }
@@ -106,11 +95,9 @@ class RequestFormsServices {
           
           if (!existingTravel) {
             await travelsData.createTravelFromRequest(updatedRequest);
-            console.log(`[SYNC] Created travels record for Request ID: ${updatedRequest.id} (${updatedRequest.requestId})`);
           }
         } catch (travErr) {
           syncPassed = false;
-          console.error(`[SYNC] CRITICAL: Failed to create travels record for Request ID: ${updatedRequest.id}. TICKET ABORTED.`, travErr);
         }
       }
 
@@ -135,7 +122,6 @@ ${data.status === 'approved' ? 'A driver and vehicle have been assigned to your 
               const signatureBuffer = await fs.readFile(signaturePath);
               signatureBase64 = `data:image/png;base64,${signatureBuffer.toString('base64')}`;
             } catch (err) {
-              console.error("Failed to read signature file:", err);
             }
           }
 
@@ -167,18 +153,13 @@ ${data.status === 'approved' ? 'A driver and vehicle have been assigned to your 
           const currentStatus = (updatedRequest.status || "").toLowerCase();
           const storageDir = currentStatus === 'approved' ? approvedPath : rejectedPath;
 
-          console.log(`[DEBUG] Attempting to store ${currentStatus} ticket. storageDir: ${storageDir}`);
-
           if (storageDir) {
             try {
               await fs.mkdir(storageDir, { recursive: true });
               const fileName = `TripTicket_${updatedRequest.requestId || updatedRequest.id}.pdf`;
               const fullPath = path.join(storageDir, fileName);
-              console.log(`[DEBUG] Saving PDF to: ${fullPath}`);
               await fs.writeFile(fullPath, pdfBuffer);
-              console.log(`[DEBUG] PDF saved successfully at: ${fullPath}`);
             } catch (storageError) {
-              console.error(`[DEBUG] Failed to store ${currentStatus} ticket in ${storageDir}:`, storageError);
             }
           }
 
@@ -187,13 +168,11 @@ ${data.status === 'approved' ? 'A driver and vehicle have been assigned to your 
             content: pdfBuffer
           });
         } catch (pdfError) {
-          console.error("Failed to generate PDF:", pdfError);
         }
 
         try {
           await sendEmail(updatedRequest.email, subject, text, null, attachments);
         } catch (error) {
-          console.error("Failed to send notification email:", error);
         }
       }
     }
@@ -227,7 +206,6 @@ ${data.status === 'approved' ? 'A driver and vehicle have been assigned to your 
         const signatureBuffer = await fs.readFile(signaturePath);
         signatureBase64 = `data:image/png;base64,${signatureBuffer.toString('base64')}`;
       } catch (err) {
-        console.error("Failed to read signature file:", err);
       }
     }
 

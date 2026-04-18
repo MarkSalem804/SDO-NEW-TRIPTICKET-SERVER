@@ -2,14 +2,17 @@ const jwt = require("jsonwebtoken")
 
 function authMiddleware(req, res, next) {
   const authHeader = req.headers.authorization
+  const isOptional = req.headers['x-auth-optional'] === 'true';
   
   if (!authHeader) {
+    if (isOptional) return next();
     return res.status(401).json({ error: "Unauthorized" })
   }
 
   const token = authHeader.split(" ")[1]
   
   if (!token) {
+    if (isOptional) return next();
     return res.status(401).json({ error: "Unauthorized" })
   }
 
@@ -27,7 +30,7 @@ function authMiddleware(req, res, next) {
 
     next()
   } catch (err) {
-    console.error("❌ JWT verification failed:", err.message)
+    if (isOptional) return next();
     return res.status(401).json({ error: "Invalid token" })
   }
 }

@@ -17,31 +17,26 @@ class UsersController {
   async login(req, res) {
     try {
       const { email, password } = req.body;
-      console.log(`[AUTH] Login attempt for: ${email}`);
       
       const result = await usersService.login(email, password);
 
       if (result.mfaRequired) {
-        console.log(`[AUTH] MFA required for user ID: ${result.userId}`);
         return res.status(200).json({ mfaRequired: true, userId: result.userId });
       }
 
       if (result.pincodeRequired) {
-        console.log(`[AUTH] PIN code required for user ID: ${result.userId}`);
         return res.status(200).json({ pincodeRequired: true, userId: result.userId, email: result.email });
       }
 
       // Set cookie for silent refresh
       res.cookie("refreshtoken", result.refreshtoken, tokenUtils.cookieOptions);
 
-      console.log(`[AUTH] Login successful for: ${email}`);
       res.status(200).json({ 
         message: "Login successful", 
         user: result.user, 
         accesstoken: result.accesstoken
       });
     } catch (error) {
-      console.error(`[AUTH] Login FAILED for: ${req.body.email} - Reason: ${error.message}`);
       res.status(401).json({ message: error.message });
     }
   }
@@ -87,15 +82,15 @@ class UsersController {
   async refresh(req, res) {
     try {
       const token = req.cookies.refreshtoken;
+      if (!token) return res.status(200).json({ authenticated: false });
+
       const { accesstoken, refreshtoken, user } = await usersService.refreshToken(token);
       
-      // Update the secure cookie with the new rotated refresh token
       res.cookie("refreshtoken", refreshtoken, tokenUtils.cookieOptions);
-      
-      res.status(200).json({ accesstoken, user });
+      res.status(200).json({ authenticated: true, accesstoken, user });
     } catch (error) {
       res.clearCookie("refreshtoken", tokenUtils.cookieOptions);
-      res.status(401).json({ message: error.message });
+      res.status(200).json({ authenticated: false });
     }
   }
 
@@ -113,11 +108,11 @@ class UsersController {
   async getMe(req, res) {
     try {
       const user = await usersService.getUserById(req.user.id);
-      if (!user) return res.status(404).json({ message: "User not found" });
+      if (!user) return res.status(200).json({ authenticated: false });
       const { password, ...userData } = user;
-      res.status(200).json(userData);
+      res.status(200).json({ authenticated: true, ...userData });
     } catch (error) {
-      res.status(401).json({ message: "Not authenticated" });
+      res.status(200).json({ authenticated: false });
     }
   }
 

@@ -27,7 +27,6 @@ class UsersService {
   }
 
   async register(data) {
-    console.log(`[AUTH] Registering new user: ${data.email}`);
     const existingUser = await usersData.findUserByEmail(data.email);
     if (existingUser) {
       throw new Error("User already exists");
@@ -43,7 +42,6 @@ class UsersService {
     
     // Send email with original generated password
     try {
-      console.log(`[MAIL] Sending credentials to: ${user.email}`);
       await sendEmail(
         user.email,
         "SDO - Trip Ticket | Account Created",
@@ -62,7 +60,6 @@ class UsersService {
         `
       );
     } catch (err) {
-      console.error("[MAIL] Failed to send registration email:", err);
     }
     
     return user;
@@ -85,7 +82,6 @@ class UsersService {
     }
 
     if (user.pincodeEnabled) {
-      console.log(`[AUTH] PIN code required for user: ${user.email}`);
       return { pincodeRequired: true, userId: user.id, email: user.email };
     }
 
@@ -144,22 +140,18 @@ class UsersService {
   }
 
   async generateUserTokens(user) {
-    console.log(`[AUTH] Generating tokens for user: ${user.email} (ID: ${user.id})`);
     const { password: userPassword, ...userData } = user;
     
     const accesstoken = tokenUtils.generateAccessToken(userData);
     const refreshtoken = tokenUtils.generateRefreshToken(userData);
 
-    // Persist session (access token) and refresh token in DB
     await Promise.all([
       usersData.deleteUserRefreshTokens(user.id),
       // Optional: if you want to allow only one active session at a time, uncomment below
       // prisma.sessionToken.deleteMany({ where: { userId: user.id } }) 
     ]);
 
-    console.log(`[AUTH] Saving session token to database...`);
     const session = await usersData.createSessionToken(user.id, accesstoken);
-    console.log(`[AUTH] Session created with ID: ${session.id}`);
 
     await usersData.createRefreshToken(user.id, refreshtoken);
 
@@ -172,7 +164,6 @@ class UsersService {
     // Check if token exists in DB
     const storedToken = await usersData.findRefreshToken(token);
     if (!storedToken) {
-      console.warn("[AUTH] Invalid refresh token attempt detected.");
       throw new Error("Invalid refresh token");
     }
 
@@ -204,7 +195,6 @@ class UsersService {
     } catch (err) {
       // Token is expired or invalid
       await usersData.deleteRefreshToken(token);
-      console.error(`[AUTH] Silent refresh failed: ${err.message}`);
       throw new Error("Session expired, please login again");
     }
   }
@@ -251,7 +241,6 @@ class UsersService {
 
     // Send email with new password
     try {
-      console.log(`[MAIL] Sending reset credentials to: ${user.email}`);
       await sendEmail(
         user.email,
         "SDO - Trip Ticket | Password Reset",
@@ -270,7 +259,6 @@ class UsersService {
         `
       );
     } catch (err) {
-      console.error("[MAIL] Failed to send reset email:", err);
     }
 
     return { success: true, newPassword: finalPassword };

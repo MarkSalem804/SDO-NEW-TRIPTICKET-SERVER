@@ -12,19 +12,15 @@ const socket = {
           "https://sdoictripticket.depedimuscity.com",
           "https://sdotripticket.depedimuscity.com"
         ],
-        methods: ["GET", "POST"],
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
         credentials: true
       }
     });
 
     io.on("connection", (socket) => {
-      console.log(`🔌 New client connected: ${socket.id}`);
-
       // Handle user identification for session management
       socket.on("identify", (userId) => {
         if (userId) {
-          console.log(`🆔 User ${userId} identified on socket ${socket.id}`);
-          
           // Notify other sessions of this user that they have been logged in elsewhere
           socket.to(`user_${userId}`).emit("session-conflict", {
             message: "Your account has been logged in from another device or browser. You will be logged out."
@@ -37,7 +33,6 @@ const socket = {
 
       // Handle disconnect
       socket.on("disconnect", () => {
-        console.log(`❌ Client disconnected: ${socket.id}`);
       });
     });
 

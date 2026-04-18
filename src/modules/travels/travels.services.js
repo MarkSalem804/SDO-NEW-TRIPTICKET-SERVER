@@ -34,7 +34,6 @@ class TravelsServices {
         const io = socket.getIO();
         io.emit("new-travel-log", { type: "IN", travel: updatedTravel });
       } catch (err) {
-        console.error("Socket emit failed:", err.message);
       }
       
       return {
@@ -67,7 +66,6 @@ class TravelsServices {
         const io = socket.getIO();
         io.emit("new-travel-log", { type: "OUT", travel: travelRecord });
       } catch (err) {
-        console.error("Socket emit failed:", err.message);
       }
 
       return {

@@ -18,7 +18,6 @@ async function generateTripId(prismaModel, idField) {
 
   // 3. Get next ticket number for today
   if (!prismaModel) {
-    console.error("[ID_GEN] prismaModel is UNDEFINED. Check your model name mapping.");
     throw new Error("ID Generator: Database model is not correctly initialized.");
   }
 

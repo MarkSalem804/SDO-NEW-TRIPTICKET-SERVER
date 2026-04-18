@@ -17,7 +17,6 @@ async function generateReport(type, data) {
             const logoBuffer = await fs.readFile(logoPath);
             logoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`;
         } catch (err) {
-            console.warn("Logo not found at specified path, continuing without logo.", err);
         }
 
         const html = template({
@@ -47,7 +46,6 @@ async function generateReport(type, data) {
         await browser.close();
         return pdf;
     } catch (error) {
-        console.error("Error generating report PDF:", error);
         throw error;
     }
 }

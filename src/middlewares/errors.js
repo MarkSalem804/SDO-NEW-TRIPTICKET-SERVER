@@ -1,12 +1,11 @@
 const errorHandler = (err, req, res, next) => {
-  console.error("❌ ERROR STACK:", err.stack);
+
 
   let statusCode = err.statusCode || 500;
   let message = err.message || "An unexpected error occurred on the server.";
 
   // Sanitize Prisma errors (they are too verbose for Sonner)
   if (message.includes("prisma") || message.includes("invocation")) {
-    console.error("🧹 Sanitizing Prisma error for UI...");
     
     if (message.includes("Unique constraint failed")) {
       message = "A record with this information already exists.";
