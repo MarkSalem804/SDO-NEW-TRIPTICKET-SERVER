@@ -26,6 +26,11 @@ class UsersController {
         return res.status(200).json({ mfaRequired: true, userId: result.userId });
       }
 
+      if (result.pincodeRequired) {
+        console.log(`[AUTH] PIN code required for user ID: ${result.userId}`);
+        return res.status(200).json({ pincodeRequired: true, userId: result.userId, email: result.email });
+      }
+
       // Set cookie for silent refresh
       res.cookie("refreshtoken", result.refreshtoken, tokenUtils.cookieOptions);
 

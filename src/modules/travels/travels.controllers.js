@@ -66,6 +66,20 @@ class TravelsControllers {
       next(error);
     }
   }
+
+  async generateExcelReport(req, res, next) {
+    try {
+      const { filterType, from, to, driverId } = req.query;
+      const excelBuffer = await travelsServices.generateExcelReport({ filterType, from, to, driverId });
+      
+      const filename = `travel_ticket_report_${new Date().getTime()}.xlsx`;
+      res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+      res.setHeader("Content-Disposition", `attachment; filename=${filename}`);
+      res.send(excelBuffer);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = new TravelsControllers();

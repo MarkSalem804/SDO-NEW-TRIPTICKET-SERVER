@@ -84,6 +84,11 @@ class UsersService {
       return { mfaRequired: true, userId: user.id };
     }
 
+    if (user.pincodeEnabled) {
+      console.log(`[AUTH] PIN code required for user: ${user.email}`);
+      return { pincodeRequired: true, userId: user.id, email: user.email };
+    }
+
     return await this.generateUserTokens(user);
   }
 

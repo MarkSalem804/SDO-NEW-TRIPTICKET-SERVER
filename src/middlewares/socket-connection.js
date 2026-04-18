@@ -20,11 +20,19 @@ const socket = {
     io.on("connection", (socket) => {
       console.log(`🔌 New client connected: ${socket.id}`);
 
-      // Example: listen for a custom event
-      socket.on("message", (data) => {
-        console.log("📩 Message received:", data);
-        // Broadcast to all connected clients
-        io.emit("message", data);
+      // Handle user identification for session management
+      socket.on("identify", (userId) => {
+        if (userId) {
+          console.log(`🆔 User ${userId} identified on socket ${socket.id}`);
+          
+          // Notify other sessions of this user that they have been logged in elsewhere
+          socket.to(`user_${userId}`).emit("session-conflict", {
+            message: "Your account has been logged in from another device or browser. You will be logged out."
+          });
+
+          // Join the user-specific room
+          socket.join(`user_${userId}`);
+        }
       });
 
       // Handle disconnect

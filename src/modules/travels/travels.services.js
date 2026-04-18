@@ -1,5 +1,6 @@
 const travelsData = require("./travels.data");
 const generateReport = require("../../utils/reportGenerator");
+const generateExcel = require("../../utils/excelGenerator");
 const { format } = require("date-fns");
 const socket = require("../../middlewares/socket-connection");
 
@@ -162,6 +163,51 @@ class TravelsServices {
 
     // 3. Generate PDF
     return await generateReport(reportType, formattedData);
+  }
+
+  async generateExcelReport({ filterType, from, to, driverId }) {
+    // 1. Fetch data based on filters (same logic as generateReport)
+    let travels = await travelsData.getAllTravels();
+    
+    if (driverId) {
+      travels = travels.filter(t => t.driverId === driverId || String(t.driverId) === String(driverId));
+    }
+
+    if (filterType === "custom" && from && to) {
+      const startDate = new Date(from);
+      const endDate = new Date(to);
+      travels = travels.filter(t => {
+        const d = t.departureDate || t.createdAt;
+        const recordDate = new Date(d);
+        return recordDate >= startDate && recordDate <= endDate;
+      });
+    } else if (filterType === "monthly") {
+       const now = new Date();
+       travels = travels.filter(t => {
+         const d = t.departureDate || t.createdAt;
+         const recordDate = new Date(d);
+         return recordDate.getMonth() === now.getMonth() && recordDate.getFullYear() === now.getFullYear();
+       });
+    }
+
+    // 2. Format for Excel
+    const formattedData = {
+      travels: travels.map(t => ({
+        tripticketId: t.tripticketId || "N/A",
+        driver: t.driver?.name || "N/A",
+        vehicle: t.vehicle ? `${t.vehicle.vehicleName} (${t.vehicle.plateNumber})` : "N/A",
+        requestor: t.requestForm?.requestedBy || "N/A",
+        passengers: t.requestForm?.authorizedPassengers ? 
+          (Array.isArray(t.requestForm.authorizedPassengers) ? t.requestForm.authorizedPassengers.join(", ") : t.requestForm.authorizedPassengers) : "N/A",
+        departureDate: t.departureDate ? format(t.departureDate, "MM-dd-yyyy") : "N/A",
+        departureTime: t.departureTime ? format(t.departureTime, "hh:mm a") : "N/A",
+        arrivalDate: t.arrivalDate ? format(t.arrivalDate, "MM-dd-yyyy") : "N/A",
+        arrivalTime: t.arrivalTime ? format(t.arrivalTime, "hh:mm a") : "N/A",
+        approvedDate: t.createdAt ? format(t.createdAt, "MM-dd-yyyy hh:mm a") : "N/A"
+      }))
+    };
+
+    return await generateExcel('travel-ticket-report', formattedData);
   }
 }
 
