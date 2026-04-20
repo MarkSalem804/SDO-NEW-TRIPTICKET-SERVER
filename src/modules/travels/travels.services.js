@@ -2,6 +2,7 @@ const travelsData = require("./travels.data");
 const generateReport = require("../../utils/reportGenerator");
 const generateExcel = require("../../utils/excelGenerator");
 const { format } = require("date-fns");
+const { unshiftLiteral } = require("../../utils/dateHelper");
 const socket = require("../../middlewares/socket-connection");
 
 class TravelsServices {
@@ -136,7 +137,7 @@ class TravelsServices {
     const formattedData = {
       month: format(new Date(), "MMMM yyyy"),
       travels: travels.map(t => ({
-        date: t.departureDate ? format(t.departureDate, "MM-dd-yyyy") : format(t.createdAt, "MM-dd-yyyy"),
+        date: t.departureDate ? format(unshiftLiteral(t.departureDate), "MM-dd-yyyy") : format(t.createdAt, "MM-dd-yyyy"),
         destination: t.requestForm?.destination || "N/A",
         tollFee: t.tollFee || "",
         distance: t.distance || "",
@@ -146,8 +147,8 @@ class TravelsServices {
           (Array.isArray(t.requestForm.authorizedPassengers) ? t.requestForm.authorizedPassengers.join(", ") : t.requestForm.authorizedPassengers) : "N/A",
         tripticketId: t.tripticketId || "N/A",
         requestor: t.requestForm?.requestedBy || "N/A",
-        departure: t.departureTime ? format(t.departureTime, "hh:mm a") : "N/A",
-        arrival: t.arrivalTime ? format(t.arrivalTime, "hh:mm a") : "N/A",
+        departure: t.departureTime ? format(unshiftLiteral(t.departureTime), "hh:mm a") : "N/A",
+        arrival: t.arrivalTime ? format(unshiftLiteral(t.arrivalTime), "hh:mm a") : "N/A",
       }))
     };
 
@@ -197,10 +198,10 @@ class TravelsServices {
         requestor: t.requestForm?.requestedBy || "N/A",
         passengers: t.requestForm?.authorizedPassengers ? 
           (Array.isArray(t.requestForm.authorizedPassengers) ? t.requestForm.authorizedPassengers.join(", ") : t.requestForm.authorizedPassengers) : "N/A",
-        departureDate: t.departureDate ? format(t.departureDate, "MM-dd-yyyy") : "N/A",
-        departureTime: t.departureTime ? format(t.departureTime, "hh:mm a") : "N/A",
-        arrivalDate: t.arrivalDate ? format(t.arrivalDate, "MM-dd-yyyy") : "N/A",
-        arrivalTime: t.arrivalTime ? format(t.arrivalTime, "hh:mm a") : "N/A",
+        departureDate: t.departureDate ? format(unshiftLiteral(t.departureDate), "MM-dd-yyyy") : "N/A",
+        departureTime: t.departureTime ? format(unshiftLiteral(t.departureTime), "hh:mm a") : "N/A",
+        arrivalDate: t.arrivalDate ? format(unshiftLiteral(t.arrivalDate), "MM-dd-yyyy") : "N/A",
+        arrivalTime: t.arrivalTime ? format(unshiftLiteral(t.arrivalTime), "hh:mm a") : "N/A",
         approvedDate: t.createdAt ? format(t.createdAt, "MM-dd-yyyy hh:mm a") : "N/A"
       }))
     };

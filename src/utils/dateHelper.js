@@ -42,4 +42,12 @@ const toLocalLiteral = (date) => {
   return new Date(d.getTime() - d.getTimezoneOffset() * 60000);
 };
 
-module.exports = { toPhilippineISO, convertDatesToPhilippineTime, toLocalLiteral };
+const unshiftLiteral = (date) => {
+  if (!date) return null;
+  const d = new Date(date);
+  if (isNaN(d)) return null;
+  // Reverse the shift by adding the timezone offset back
+  return new Date(d.getTime() + d.getTimezoneOffset() * 60000);
+};
+
+module.exports = { toPhilippineISO, convertDatesToPhilippineTime, toLocalLiteral, unshiftLiteral };
