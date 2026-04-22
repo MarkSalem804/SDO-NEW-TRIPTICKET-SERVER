@@ -86,31 +86,35 @@ class RequestFormsControllers {
 
       const attachmentsPath = process.env.ATTACHMENTS_PATH || 'uploads';
       
-      // Construct the path: ATTACHMENTS_PATH / requestId / fileName
-      const originalPath = path.join(attachmentsPath, requestId, fileName);
+      // Construct the absolute path and the base directory for security validation
+      const baseDir = path.resolve(attachmentsPath);
+      const originalPath = path.resolve(baseDir, requestId, fileName);
+
+      console.log(`[ATTACHMENT_DEBUG] Attempting to access: "${originalPath}"`);
+
+      // SECURITY: Ensure the requested file is actually inside the authorized attachments directory
+      if (!originalPath.startsWith(baseDir)) {
+        console.warn(`[SECURITY_ALERT] Blocked unauthorized path traversal attempt: "${originalPath}"`);
+        return res.status(403).json({ success: false, message: "Unauthorized access" });
+      }
 
       if (!fs.existsSync(originalPath)) {
-        console.error(`File not found: ${originalPath}`);
+        console.error(`[ATTACHMENT_ERROR] File not found: "${originalPath}"`);
         return res.status(404).json({ success: false, message: "File not found on system" });
       }
 
-      const ext = path.extname(fileName).toLowerCase();
-      const contentTypeMap = {
-        '.pdf': 'application/pdf',
-        '.jpg': 'image/jpeg',
-        '.jpeg': 'image/jpeg',
-        '.png': 'image/png',
-        '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        '.doc': 'application/msword'
-      };
-
-      const contentType = contentTypeMap[ext] || 'application/octet-stream';
+      const absoluteFilePath = path.resolve(originalPath);
       
-      res.setHeader("Content-Type", contentType);
       res.setHeader("Content-Disposition", `inline; filename="${encodeURIComponent(fileName)}"`);
       
-      const fileStream = fs.createReadStream(originalPath);
-      fileStream.pipe(res);
+      res.sendFile(absoluteFilePath, (err) => {
+        if (err) {
+          console.error(`[res.sendFile Error] for path "${absoluteFilePath}":`, err);
+          if (!res.headersSent) {
+            res.status(err.status || 500).end();
+          }
+        }
+      });
     } catch (error) {
       console.error("Attachment View Error:", error);
       next(error);
