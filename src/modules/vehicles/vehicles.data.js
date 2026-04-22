@@ -8,9 +8,11 @@ class VehiclesData {
         vehicleName: data.vehicleName,
         rfidNo: data.rfidNo,
         vehicleTypeId: parseInt(data.vehicleTypeId),
+        driverId: data.driverId ? parseInt(data.driverId) : null,
       },
       include: {
         vehicleTypes: true,
+        driver: true,
       },
     });
   }
@@ -19,6 +21,7 @@ class VehiclesData {
     return await prisma.vehicles.findMany({
       include: {
         vehicleTypes: true,
+        driver: true,
       },
     });
   }
@@ -28,6 +31,7 @@ class VehiclesData {
       where: { id: parseInt(id) },
       include: {
         vehicleTypes: true,
+        driver: true,
       },
     });
   }
@@ -40,10 +44,12 @@ class VehiclesData {
       where: { id: parseInt(id) },
       data: {
         ...scalarData,
-        vehicleTypeId: scalarData.vehicleTypeId ? parseInt(scalarData.vehicleTypeId) : undefined
+        vehicleTypeId: scalarData.vehicleTypeId ? parseInt(scalarData.vehicleTypeId) : undefined,
+        driverId: scalarData.driverId ? parseInt(scalarData.driverId) : (scalarData.driverId === null ? null : undefined)
       },
       include: {
         vehicleTypes: true,
+        driver: true,
       },
     });
   }

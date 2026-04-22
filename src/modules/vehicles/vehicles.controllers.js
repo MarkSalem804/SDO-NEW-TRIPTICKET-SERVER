@@ -4,8 +4,8 @@ const socket = require("../../middlewares/socket-connection");
 class VehiclesController {
   async createVehicle(req, res) {
     try {
-      const { vehicleName, plateNumber, vehicleTypeId, rfidNo } = req.body;
-      const vehicle = await vehiclesService.createVehicle({ vehicleName, plateNumber, vehicleTypeId, rfidNo });
+      const { vehicleName, plateNumber, vehicleTypeId, rfidNo, driverId } = req.body;
+      const vehicle = await vehiclesService.createVehicle({ vehicleName, plateNumber, vehicleTypeId, rfidNo, driverId });
       socket.getIO().emit("vehicle-update", { action: "create", vehicle });
       res.status(201).json({ message: "Vehicle created successfully", vehicle });
     } catch (error) {

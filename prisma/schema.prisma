@@ -106,6 +106,8 @@ model vehicles {
   vehicleTypes  vehicleTypes    @relation(fields: [vehicleTypeId], references: [id])
   vehicleTypeId Int
   rfidNo        String          @db.Text
+  driverId      Int?
+  driver        drivers?        @relation(fields: [driverId], references: [id])
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
   requestForms  requestForm[]
@@ -132,6 +134,7 @@ model drivers {
   requestForms    requestForm[]
   travels         travels[]
   urgentTravels   urgentTravels[]
+  vehicles        vehicles[]
 }
 
 model travels {
