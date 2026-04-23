@@ -43,12 +43,13 @@ class RequestFormsData {
     const updateData = { ...data };
     
     // Extract relation IDs and prepare connections
-    const { officeId, driverId, vehicleId, attachment, ...scalarData } = updateData;
+    const { officeId, driverId, vehicleId, attachment, rejectionReason, ...scalarData } = updateData;
     const relations = {};
 
     if (officeId) scalarData.officeId = parseInt(officeId);
     if (driverId) scalarData.driverId = parseInt(driverId);
     if (vehicleId) scalarData.vehicleId = parseInt(vehicleId);
+    if (rejectionReason) scalarData.rejectionReason = rejectionReason;
 
     // Handle date fields
     if (scalarData.departureDate) scalarData.departureDate = toLocalLiteral(scalarData.departureDate);

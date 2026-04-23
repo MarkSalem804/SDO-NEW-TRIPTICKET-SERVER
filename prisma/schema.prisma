@@ -84,6 +84,7 @@ model requestForm {
   vehicles             vehicles?       @relation(fields: [vehicleId], references: [id])
   vehicleId            Int?
   attachments          Json?
+  rejectionReason      String?         @db.Text
   createdAt            DateTime        @default(now())
   updatedAt            DateTime        @updatedAt
   travels              travels[]
