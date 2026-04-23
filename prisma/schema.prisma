@@ -107,6 +107,7 @@ model vehicles {
   vehicleTypes  vehicleTypes    @relation(fields: [vehicleTypeId], references: [id])
   vehicleTypeId Int
   rfidNo        String          @db.Text
+  fuelType      String?         @db.Text
   driverId      Int?
   driver        drivers?        @relation(fields: [driverId], references: [id])
   createdAt     DateTime        @default(now())
