@@ -17,9 +17,9 @@ const httpServer = https.createServer({
 socket.init(httpServer);
 
 // httpServer.listen(PORT, () => {
-//   console.log(`IMPACT backend running on http://localhost:${PORT}`)
+//   console.log(`Trip Ticket backend running on http://localhost:${PORT}`)
 // })
 
 httpServer.listen(PORT, () => {
-  console.log(`IMPACT backend running on https://sdoictripticket.depedimuscity.com:${PORT}`)
+  console.log(`TRIP TICKET backend running on https://sdoictripticket.depedimuscity.com:${PORT}`)
 })

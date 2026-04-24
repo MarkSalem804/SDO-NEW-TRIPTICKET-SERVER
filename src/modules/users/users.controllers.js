@@ -86,6 +86,7 @@ class UsersController {
 
       const { accesstoken, refreshtoken, user } = await usersService.refreshToken(token);
       
+      res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
       res.cookie("refreshtoken", refreshtoken, tokenUtils.cookieOptions);
       res.status(200).json({ authenticated: true, accesstoken, user });
     } catch (error) {
@@ -110,6 +111,7 @@ class UsersController {
       const user = await usersService.getUserById(req.user.id);
       if (!user) return res.status(200).json({ authenticated: false });
       const { password, ...userData } = user;
+      res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
       res.status(200).json({ authenticated: true, ...userData });
     } catch (error) {
       res.status(200).json({ authenticated: false });
