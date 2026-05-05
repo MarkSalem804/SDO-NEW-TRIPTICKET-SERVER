@@ -98,13 +98,13 @@ class TravelsServices {
     return result;
   }
 
-  async generateReport({ reportType, filterType, from, to, driverId }) {
+  async generateReport({ reportType, filterType, from, to, vehicleId }) {
     // 1. Fetch data based on filters
     let travels = await travelsData.getAllTravels();
     
-    // Filter by driver if specified
-    if (driverId) {
-      travels = travels.filter(t => t.driverId === driverId || String(t.driverId) === String(driverId));
+    // Filter by vehicle if specified
+    if (vehicleId) {
+      travels = travels.filter(t => String(t.vehicleId) === String(vehicleId));
     }
 
     // Filter by date if applicable
@@ -152,7 +152,7 @@ class TravelsServices {
       }))
     };
 
-    if (reportType === "driver-summary" && travels.length > 0) {
+    if (reportType === "vehicle-summary" && travels.length > 0) {
       formattedData.vehicleName = travels[0].vehicle?.vehicleName || "N/A";
       formattedData.plateNumber = travels[0].vehicle?.plateNumber || "N/A";
     } else {
@@ -164,12 +164,12 @@ class TravelsServices {
     return await generateReport(reportType, formattedData);
   }
 
-  async generateExcelReport({ filterType, from, to, driverId }) {
+  async generateExcelReport({ filterType, from, to, vehicleId }) {
     // 1. Fetch data based on filters (same logic as generateReport)
     let travels = await travelsData.getAllTravels();
     
-    if (driverId) {
-      travels = travels.filter(t => t.driverId === driverId || String(t.driverId) === String(driverId));
+    if (vehicleId) {
+      travels = travels.filter(t => String(t.vehicleId) === String(vehicleId));
     }
 
     if (filterType === "custom" && from && to) {

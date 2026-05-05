@@ -5,7 +5,7 @@ const path = require('path');
 
 async function generateReport(type, data) {
     try {
-        const templateFile = type === 'driver-summary' ? 'driver-summary.hbs' : 'trip-logs.hbs';
+        const templateFile = type === 'vehicle-summary' ? 'vehicle-summary.hbs' : 'trip-logs.hbs';
         const templatePath = path.join(__dirname, '../templates', templateFile);
         const templateHtml = await fs.readFile(templatePath, 'utf-8');
         const template = handlebars.compile(templateHtml);
@@ -33,7 +33,7 @@ async function generateReport(type, data) {
         
         const pdf = await page.pdf({
             format: 'A4',
-            landscape: type === 'driver-summary', // Driver summary is better in landscape
+            landscape: true, // All reports are now better in landscape
             printBackground: true,
             margin: {
                 top: '5mm',

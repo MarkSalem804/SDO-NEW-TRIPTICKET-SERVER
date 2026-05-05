@@ -55,8 +55,8 @@ class TravelsControllers {
 
   async generateReport(req, res, next) {
     try {
-      const { reportType, filterType, from, to, driverId } = req.query;
-      const pdfBuffer = await travelsServices.generateReport({ reportType, filterType, from, to, driverId });
+      const { reportType, filterType, from, to, vehicleId } = req.query;
+      const pdfBuffer = await travelsServices.generateReport({ reportType, filterType, from, to, vehicleId });
       
       const filename = `${reportType}_report_${new Date().getTime()}.pdf`;
       res.setHeader("Content-Type", "application/pdf");
@@ -69,8 +69,8 @@ class TravelsControllers {
 
   async generateExcelReport(req, res, next) {
     try {
-      const { filterType, from, to, driverId } = req.query;
-      const excelBuffer = await travelsServices.generateExcelReport({ filterType, from, to, driverId });
+      const { filterType, from, to, vehicleId } = req.query;
+      const excelBuffer = await travelsServices.generateExcelReport({ filterType, from, to, vehicleId });
       
       const filename = `travel_ticket_report_${new Date().getTime()}.xlsx`;
       res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
