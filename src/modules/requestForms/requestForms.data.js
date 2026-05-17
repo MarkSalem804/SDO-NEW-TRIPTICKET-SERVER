@@ -80,6 +80,18 @@ class RequestFormsData {
   }
 
   async getRequestById(id) {
+    const isPureNumber = /^\d+$/.test(String(id).trim());
+    if (!isPureNumber) {
+      return await prisma.requestForm.findUnique({
+        where: { requestId: id },
+        include: {
+          office: true,
+          drivers: true,
+          vehicles: true,
+          travels: true,
+        },
+      });
+    }
     return await prisma.requestForm.findUnique({
       where: { id: parseInt(id) },
       include: {
