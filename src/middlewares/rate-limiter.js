@@ -56,4 +56,8 @@ const rateLimiter = (windowMs, maxRequests) => {
   };
 };
 
+rateLimiter.reset = (ip) => {
+  rateLimits.delete(ip);
+};
+
 module.exports = rateLimiter;

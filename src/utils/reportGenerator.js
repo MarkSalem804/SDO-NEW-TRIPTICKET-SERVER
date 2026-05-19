@@ -10,18 +10,19 @@ async function generateReport(type, data) {
         const templateHtml = await fs.readFile(templatePath, 'utf-8');
         const template = handlebars.compile(templateHtml);
         
-        // Convert logo if needed
-        let logoBase64 = "";
+        // Convert header image if available
+        let headerBase64 = "";
         try {
-            const logoPath = path.join(__dirname, "../assets/kagawaran.png");
-            const logoBuffer = await fs.readFile(logoPath);
-            logoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`;
+            const headerPath = path.join(__dirname, "../templates/header.png");
+            const headerBuffer = await fs.readFile(headerPath);
+            headerBase64 = `data:image/png;base64,${headerBuffer.toString('base64')}`;
         } catch (err) {
+            console.error("Error reading header image:", err);
         }
 
         const html = template({
             ...data,
-            logoBase64
+            headerBase64
         });
 
         const browser = await puppeteer.launch({

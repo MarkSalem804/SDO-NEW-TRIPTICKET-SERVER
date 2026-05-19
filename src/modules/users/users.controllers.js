@@ -1,6 +1,7 @@
 const usersService = require("./users.services");
 const tokenUtils = require("../../utils/token.utils");
 const socket = require("../../middlewares/socket-connection");
+const rateLimiter = require("../../middlewares/rate-limiter");
 
 class UsersController {
   async register(req, res) {
@@ -19,6 +20,10 @@ class UsersController {
       const { email, password } = req.body;
       
       const result = await usersService.login(email, password);
+
+      // Reset rate limiter on successful credentials validation
+      const ip = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+      rateLimiter.reset(ip);
 
       if (result.mfaRequired) {
         return res.status(200).json({ mfaRequired: true, userId: result.userId });
@@ -45,6 +50,10 @@ class UsersController {
     try {
       const { email, pin } = req.body;
       const result = await usersService.loginWithPin(email, pin);
+
+      // Reset rate limiter on successful PIN validation
+      const ip = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+      rateLimiter.reset(ip);
 
       if (result.mfaRequired) {
         return res.status(200).json({ mfaRequired: true, userId: result.userId });
