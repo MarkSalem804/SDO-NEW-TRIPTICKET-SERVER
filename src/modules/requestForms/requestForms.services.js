@@ -70,6 +70,27 @@ class RequestFormsServices {
       throw new Error("Request Form not found");
     }
 
+    // Check if the trip request is beyond departure date
+    if (originalRequest.departureTime && (originalRequest.status === "pending" || originalRequest.status === "ARCHIVED")) {
+      const { unshiftLiteral } = require("../../utils/dateHelper");
+      const now = new Date();
+      const depTime = new Date(originalRequest.departureTime);
+      const unshiftedDepTime = unshiftLiteral(depTime);
+      
+      if (now > depTime || now > unshiftedDepTime) {
+        if (originalRequest.status !== "ARCHIVED") {
+          await requestFormsData.updateRequest(id, { status: "ARCHIVED" });
+          try {
+            const archived = await requestFormsData.getRequestById(id);
+            socket.getIO().emit("new-trip-request", { type: "UPDATE", request: archived });
+          } catch (err) {}
+        }
+        if (data.status === "approved" || data.status === "rejected") {
+          throw new Error("This trip request has passed its departure date and cannot be approved or rejected.");
+        }
+      }
+    }
+
     // Generate requestId if status changes to approved or rejected and it doesn't have one yet
     if (data.status && data.status !== originalRequest.status && !originalRequest.requestId) {
       if (data.status === "approved" || data.status === "rejected") {
@@ -185,10 +206,58 @@ ${data.status === 'approved' ? 'A driver and vehicle have been assigned to your 
   }
 
   async getRequestById(id) {
-    return await requestFormsData.getRequestById(id);
+    const request = await requestFormsData.getRequestById(id);
+    if (request && request.status === "pending" && request.departureTime) {
+      const now = new Date();
+      const depTime = new Date(request.departureTime);
+      const { unshiftLiteral } = require("../../utils/dateHelper");
+      const unshiftedDepTime = unshiftLiteral(depTime);
+      if (now > depTime || now > unshiftedDepTime) {
+        const archivedRequest = await requestFormsData.updateRequest(id, { status: "ARCHIVED" });
+        try {
+          socket.getIO().emit("new-trip-request", { type: "UPDATE", request: archivedRequest });
+        } catch (err) {}
+        return archivedRequest;
+      }
+    }
+    return request;
   }
 
   async getAllRequests() {
+    try {
+      const pendingRequests = await prisma.requestForm.findMany({
+        where: { status: "pending" },
+      });
+      const now = new Date();
+      const { unshiftLiteral } = require("../../utils/dateHelper");
+      const toArchive = [];
+      
+      for (const req of pendingRequests) {
+        if (req.departureTime) {
+          const depTime = new Date(req.departureTime);
+          const unshiftedDepTime = unshiftLiteral(depTime);
+          if (now > depTime || now > unshiftedDepTime) {
+            toArchive.push(req.id);
+          }
+        }
+      }
+      
+      if (toArchive.length > 0) {
+        await prisma.requestForm.updateMany({
+          where: { id: { in: toArchive } },
+          data: { status: "ARCHIVED" },
+        });
+        
+        for (const id of toArchive) {
+          const updated = await requestFormsData.getRequestById(id);
+          try {
+            socket.getIO().emit("new-trip-request", { type: "UPDATE", request: updated });
+          } catch (err) {}
+        }
+      }
+    } catch (err) {
+      console.error("Error auto-archiving requests:", err);
+    }
     return await requestFormsData.getAllRequests();
   }
 
