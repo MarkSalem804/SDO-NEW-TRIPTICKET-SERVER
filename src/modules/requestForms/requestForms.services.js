@@ -8,6 +8,20 @@ const prisma = require("../../utils/prisma");
 const generateTicket = require("../../utils/generateTicket");
 const socket = require("../../middlewares/socket-connection");
 
+function isPassedDeparture(req) {
+  if (!req.departureDate) return false;
+  const now = new Date();
+  const depDate = new Date(req.departureDate);
+  // Set to end of the day in local time (23:59:59.999)
+  const endOfDay = new Date(
+    depDate.getFullYear(),
+    depDate.getMonth(),
+    depDate.getDate(),
+    23, 59, 59, 999
+  );
+  return now > endOfDay;
+}
+
 class RequestFormsServices {
   async createRequest(data, files) {
     if (!data.requestedBy || !data.email) {
@@ -71,13 +85,8 @@ class RequestFormsServices {
     }
 
     // Check if the trip request is beyond departure date
-    if (originalRequest.departureTime && (originalRequest.status === "pending" || originalRequest.status === "ARCHIVED")) {
-      const { unshiftLiteral } = require("../../utils/dateHelper");
-      const now = new Date();
-      const depTime = new Date(originalRequest.departureTime);
-      const unshiftedDepTime = unshiftLiteral(depTime);
-      
-      if (now > depTime || now > unshiftedDepTime) {
+    if (originalRequest.departureDate && (originalRequest.status === "pending" || originalRequest.status === "ARCHIVED")) {
+      if (isPassedDeparture(originalRequest)) {
         if (originalRequest.status !== "ARCHIVED") {
           await requestFormsData.updateRequest(id, { status: "ARCHIVED" });
           try {
@@ -207,12 +216,8 @@ ${data.status === 'approved' ? 'A driver and vehicle have been assigned to your 
 
   async getRequestById(id) {
     const request = await requestFormsData.getRequestById(id);
-    if (request && request.status === "pending" && request.departureTime) {
-      const now = new Date();
-      const depTime = new Date(request.departureTime);
-      const { unshiftLiteral } = require("../../utils/dateHelper");
-      const unshiftedDepTime = unshiftLiteral(depTime);
-      if (now > depTime || now > unshiftedDepTime) {
+    if (request && request.status === "pending" && request.departureDate) {
+      if (isPassedDeparture(request)) {
         const archivedRequest = await requestFormsData.updateRequest(id, { status: "ARCHIVED" });
         try {
           socket.getIO().emit("new-trip-request", { type: "UPDATE", request: archivedRequest });
@@ -228,17 +233,11 @@ ${data.status === 'approved' ? 'A driver and vehicle have been assigned to your 
       const pendingRequests = await prisma.requestForm.findMany({
         where: { status: "pending" },
       });
-      const now = new Date();
-      const { unshiftLiteral } = require("../../utils/dateHelper");
       const toArchive = [];
       
       for (const req of pendingRequests) {
-        if (req.departureTime) {
-          const depTime = new Date(req.departureTime);
-          const unshiftedDepTime = unshiftLiteral(depTime);
-          if (now > depTime || now > unshiftedDepTime) {
-            toArchive.push(req.id);
-          }
+        if (isPassedDeparture(req)) {
+          toArchive.push(req.id);
         }
       }
       
