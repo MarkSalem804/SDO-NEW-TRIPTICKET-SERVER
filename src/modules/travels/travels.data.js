@@ -28,13 +28,21 @@ class TravelsData {
       };
     }
 
-    // 2. Check for request with a SCHEDULED travel
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+    const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
+    // 2. Check for request with a SCHEDULED travel today
     const scheduledTravel = await prisma.travels.findFirst({
       where: {
         vehicleId,
         travelStatus: "SCHEDULED",
         requestForm: {
-          status: "approved"
+          status: "approved",
+          departureDate: {
+            gte: startOfToday,
+            lte: endOfToday
+          }
         }
       },
       include: {
