@@ -116,6 +116,7 @@ model vehicles {
   travels       travels[]
   urgentTravels urgentTravels[]
   vehicleLogs   vehicleLogs[]
+  urgentTrips   urgentTrips[]
 }
 
 model vehicleTypes {
@@ -185,6 +186,17 @@ model travelAuthorities {
 }
 
 model vehicleLogs {
+  id        Int      @id @default(autoincrement())
+  rfidNo    String   @db.Text
+  vehicleId Int
+  vehicle   vehicles @relation(fields: [vehicleId], references: [id])
+  type      String   @db.Text // "IN" or "OUT"
+  timestamp DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model urgentTrips {
   id        Int      @id @default(autoincrement())
   rfidNo    String   @db.Text
   vehicleId Int

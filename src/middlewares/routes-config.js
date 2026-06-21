@@ -8,6 +8,7 @@ const officesRoutes = require("../modules/offices/offices.routes");
 const vehicleLogsRoutes = require("../modules/vehicleLogs/vehicleLogs.routes");
 const settingsRoutes = require("../modules/settings/settings.routes");
 const travelAuthoritiesRoutes = require("../modules/travelAuthorities/travelAuthorities.routes");
+const urgentTripsRoutes = require("../modules/urgentTrips/urgentTrips.routes");
 
 const routesConfig = (app) => {
   app.use("/api/users", userRoutes);
@@ -20,6 +21,7 @@ const routesConfig = (app) => {
   app.use("/api/vehicle-logs", vehicleLogsRoutes);
   app.use("/api/settings", settingsRoutes);
   app.use("/api/travel-authorities", travelAuthoritiesRoutes);
+  app.use("/api/urgent-trips", urgentTripsRoutes);
 };
 
 module.exports = routesConfig;

@@ -10,11 +10,24 @@ class TravelsData {
 
   // Find an active requestForm that has this vehicle assigned and is 'approved' or 'ongoing'.
   async getActiveRequestForVehicle(vehicleId) {
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+    const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
+    // `travels.departureDate` is stored shifted by `toLocalLiteral`, so we need shifted bounds
+    const { toLocalLiteral } = require("../../utils/dateHelper");
+    const shiftedStart = toLocalLiteral(startOfToday);
+    const shiftedEnd = toLocalLiteral(endOfToday);
+
     // 1. Check for request with an ONGOING travel first (it's already out, must return)
     const ongoingTravel = await prisma.travels.findFirst({
       where: { 
         vehicleId, 
-        travelStatus: "ONGOING" 
+        travelStatus: "ONGOING",
+        departureDate: {
+          gte: shiftedStart,
+          lte: shiftedEnd
+        }
       },
       include: {
         requestForm: true
@@ -27,11 +40,6 @@ class TravelsData {
         driverId: ongoingTravel.driverId // Ensure driverId is at the top level if needed by caller
       };
     }
-
-    const now = new Date();
-    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
-    const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
-
     // 2. Check for request with a SCHEDULED travel today
     const scheduledTravel = await prisma.travels.findFirst({
       where: {
@@ -217,6 +225,35 @@ class TravelsData {
   async deleteTravel(id) {
     return await prisma.travels.delete({
       where: { id: parseInt(id) },
+    });
+  }
+
+  async getTodayScheduledTravels() {
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+    const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
+    return await prisma.travels.findMany({
+      where: {
+        travelStatus: { in: ["SCHEDULED", "ONGOING"] },
+        requestForm: {
+          status: "approved",
+          departureDate: {
+            gte: startOfToday,
+            lte: endOfToday,
+          },
+        },
+      },
+      include: {
+        requestForm: true,
+        driver: true,
+        vehicle: true,
+      },
+      orderBy: {
+        requestForm: {
+          departureTime: "asc",
+        },
+      },
     });
   }
 }

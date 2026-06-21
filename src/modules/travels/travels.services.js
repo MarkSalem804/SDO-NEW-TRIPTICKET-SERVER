@@ -98,6 +98,10 @@ class TravelsServices {
     return result;
   }
 
+  async getTodayScheduled() {
+    return await travelsData.getTodayScheduledTravels();
+  }
+
   async generateReport({ reportType, filterType, from, to, vehicleId }) {
     // 1. Fetch data based on filters
     let travels = await travelsData.getAllTravels();
